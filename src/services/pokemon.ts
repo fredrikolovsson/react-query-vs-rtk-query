@@ -1,5 +1,10 @@
 import { createApi, fetchBaseQuery } from '@rtk-incubator/rtk-query'
 
+const ENTITY_TYPES = {
+  POKEMON: 'Pokemon',
+  POKEMON_LIST_ITEM: 'PokemonListItem',
+} as const
+
 export type Pokemon = {
   name: string
   sprites: {
@@ -33,10 +38,23 @@ export const pokemonApi = createApi({
         query: (params) => {
           return { url: 'pokemon', params }
         },
+        provides: (result) => {
+          return result.results.map(({ name }: { name: string }) => ({
+            type: ENTITY_TYPES.POKEMON_LIST_ITEM,
+            id: name,
+          }))
+        },
       }
     ),
     getPokemonByName: builder.query<Pokemon, string>({
       query: (name: string) => `pokemon/${name}`,
+      provides: (result) => {
+        return [
+          {
+            type: ENTITY_TYPES.POKEMON,
+            id: result.name,
+          },
+        ]
       },
     }),
   }),
