@@ -4,23 +4,22 @@ import './App.css'
 import { Pokemon } from './components/Pokemon'
 import { useGetManyPokemonQuery } from './services/pokemon'
 
+const BATCH_SIZE = 2
+
 function App() {
   const { data, error, isLoading } = useGetManyPokemonQuery({
-    limit: 5,
+    limit: BATCH_SIZE,
     offset: 0,
   })
 
   return (
     <div className="App">
-      {error ? (
-        <>Oh no, there was an error</>
-      ) : isLoading ? (
-        <>Loading...</>
-      ) : data ? (
+      {isLoading && <>Loading initial pokemon...</>}
+      {error && <>Oh no, there was an error</>}
+      {data &&
         data.results.map(({ name }: { name: string }) => {
-          return <Pokemon name={name} />
-        })
-      ) : null}
+          return <Pokemon key={name} name={name} />
+        })}
     </div>
   )
 }

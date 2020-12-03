@@ -24,9 +24,10 @@ export const Pokemon = ({
       ) : data ? (
         <>
           <h3>
-            {data.species.name} {isFetching ? '...' : ''}
+            {data.name} {isFetching ? '...' : ''}
           </h3>
-          <img src={data.sprites.front_shiny} alt={data.species.name} />
+          <p>Weight: {data.weight}</p>
+          <img src={data.sprites.front_shiny} alt={data.name} />
         </>
       ) : null}
     </>
