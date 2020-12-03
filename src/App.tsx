@@ -2,16 +2,25 @@ import React from 'react'
 
 import './App.css'
 import { Pokemon } from './components/Pokemon'
-
-const pokemonNames = ['bulbasaur', 'pikachu', 'charmander']
+import { useGetManyPokemonQuery } from './services/pokemon'
 
 function App() {
+  const { data, error, isLoading } = useGetManyPokemonQuery({
+    limit: 5,
+    offset: 0,
+  })
+
   return (
     <div className="App">
-      <Pokemon name="bulbasaur" />
-      {pokemonNames.map((name) => (
-        <Pokemon name={name} />
-      ))}
+      {error ? (
+        <>Oh no, there was an error</>
+      ) : isLoading ? (
+        <>Loading...</>
+      ) : data ? (
+        data.results.map(({ name }: { name: string }) => {
+          return <Pokemon name={name} />
+        })
+      ) : null}
     </div>
   )
 }
