@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Pokemon } from './Pokemon'
+import { PokemonList } from './PokemonList'
 import { useGetManyPokemonQuery } from '../services/pokemon'
 import { useInfinitePokemonScroll } from '../services/useInfinitePokemonScroll'
 
@@ -28,29 +28,14 @@ export function RtkQueryExample() {
   const pokemon = [...(firstPokemon?.results || []), ...(morePokemon || [])]
 
   return (
-    <div style={{ margin: 20 }}>
-      {!pokemon?.length && firstIsLoading && (
-        <div>Loading initial pokemon...</div>
-      )}
-      {firstError && <>Oh no, there was an error</>}
-      {!firstIsLoading &&
-        pokemon &&
-        pokemon.map(({ name }: { name: string }) => {
-          return <Pokemon key={name} name={name} />
-        })}
-
-      {errorFetchingMore && <>Error when trying to fetching more...</>}
-      <div style={{ height: 100, marginTop: 20 }}>
-        {!isFetchingMore &&
-          (canFetchMore ? (
-            <>Scroll down to fetch more...</>
-          ) : (
-            <>No more pokemon to fetch</>
-          ))}
-        {pokemon.length > 0 && isFetchingMore && (
-          <>Looking for {INITIAL_BATCH_SIZE} more...</>
-        )}
-      </div>
-    </div>
+    <PokemonList
+      canFetchMore={canFetchMore}
+      errorFetchingMore={errorFetchingMore}
+      firstError={firstError}
+      firstIsLoading={firstIsLoading}
+      initialBatchSize={INITIAL_BATCH_SIZE}
+      isFetchingMore={isFetchingMore}
+      pokemon={pokemon}
+    />
   )
 }
