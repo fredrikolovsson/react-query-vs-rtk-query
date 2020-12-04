@@ -1,6 +1,7 @@
 import React from 'react'
 
 import './App.css'
+import { ReactQueryExample } from './components/ReactQueryExample'
 import { RtkQueryExample } from './components/RtkQueryExample'
 
 const EXAMPLES = {
@@ -9,7 +10,7 @@ const EXAMPLES = {
 }
 
 function App() {
-  const [example, setExample] = React.useState(EXAMPLES.RTK_QUERY)
+  const [example, setExample] = React.useState(EXAMPLES.REACT_QUERY)
 
   const getOtherExampleName = () => {
     if (example === EXAMPLES.RTK_QUERY) {
@@ -22,12 +23,14 @@ function App() {
   return (
     <div className="App">
       <div style={{ marginBottom: 20 }}>
-        <h2>Infinite scroll & pull-to-refresh using {example}</h2>
+        <h2>{example}</h2>
+        <p>Infinite scroll example</p>
         <button onClick={() => setExample(getOtherExampleName())}>
           Change to {getOtherExampleName()}
         </button>
       </div>
-      <RtkQueryExample />
+      {example === EXAMPLES.REACT_QUERY && <ReactQueryExample />}
+      {example === EXAMPLES.RTK_QUERY && <RtkQueryExample />}
     </div>
   )
 }
