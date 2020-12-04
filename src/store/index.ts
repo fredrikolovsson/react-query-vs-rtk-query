@@ -12,7 +12,13 @@ export const store = configureStore({
   // Adding the api middleware enables caching, invalidation, polling,
   // and other useful features of `rtk-query`.
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(
+    getDefaultMiddleware({
+      // these caused lots of console warnings so disabled them
+      // "ImmutableStateInvariantMiddleware took 44ms, which is more than the warning threshold of 32ms"
+      // "SerializableStateInvariantMiddleware took 88ms, which is more than the warning threshold of 32ms."
+      immutableCheck: false,
+      serializableCheck: false,
+    }).concat(
       pokemonApi.middleware,
       rtkQueryErrorLogger,
       rtkQuerySuccessLogger
