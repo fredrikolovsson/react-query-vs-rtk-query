@@ -1,25 +1,33 @@
 import React from 'react'
 
 import './App.css'
-import { Pokemon } from './components/Pokemon'
-import { useGetManyPokemonQuery } from './services/pokemon'
+import { RtkQueryExample } from './components/RtkQueryExample'
 
-const BATCH_SIZE = 2
+const EXAMPLES = {
+  RTK_QUERY: 'rtk-query',
+  REACT_QUERY: 'react-query',
+}
 
 function App() {
-  const { data, error, isLoading } = useGetManyPokemonQuery({
-    limit: BATCH_SIZE,
-    offset: 0,
-  })
+  const [example, setExample] = React.useState(EXAMPLES.RTK_QUERY)
+
+  const getOtherExampleName = () => {
+    if (example === EXAMPLES.RTK_QUERY) {
+      return EXAMPLES.REACT_QUERY
+    }
+
+    return EXAMPLES.RTK_QUERY
+  }
 
   return (
     <div className="App">
-      {isLoading && <>Loading initial pokemon...</>}
-      {error && <>Oh no, there was an error</>}
-      {data &&
-        data.results.map(({ name }: { name: string }) => {
-          return <Pokemon key={name} name={name} />
-        })}
+      <div style={{ marginBottom: 20 }}>
+        <h2>Infinite scroll & pull-to-refresh using {example}</h2>
+        <button onClick={() => setExample(getOtherExampleName())}>
+          Change to {getOtherExampleName()}
+        </button>
+      </div>
+      <RtkQueryExample />
     </div>
   )
 }
