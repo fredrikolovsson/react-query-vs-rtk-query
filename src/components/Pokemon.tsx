@@ -1,6 +1,8 @@
 import React from 'react'
 import { useGetPokemonByNameQuery } from '../services/pokemon'
 
+const itemStyle = { height: 150, marginBottom: 20 }
+
 export const Pokemon = ({
   name,
   pollingInterval = 0,
@@ -20,15 +22,15 @@ export const Pokemon = ({
       {error ? (
         <>Oh no, there was an error</>
       ) : isLoading ? (
-        <>Loading...</>
+        <div style={itemStyle}>Loading {name}...</div>
       ) : data ? (
-        <>
+        <div style={itemStyle}>
           <h3>
             {data.name} {isFetching ? '...' : ''}
           </h3>
           <p>Weight: {data.weight}</p>
           <img src={data.sprites.front_shiny} alt={data.name} />
-        </>
+        </div>
       ) : null}
     </>
   )
