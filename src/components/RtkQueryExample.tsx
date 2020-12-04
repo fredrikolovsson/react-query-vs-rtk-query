@@ -4,7 +4,6 @@ import { Pokemon } from './Pokemon'
 import { useGetManyPokemonQuery } from '../services/pokemon'
 import { useInfinitePokemonScroll } from '../services/useInfinitePokemonScroll'
 
-const BATCH_LIMIT = 3
 const INITIAL_BATCH_SIZE = 5
 
 export function RtkQueryExample() {
@@ -19,28 +18,39 @@ export function RtkQueryExample() {
 
   const {
     data: morePokemon,
+    canFetchMore,
     error: errorFetchingMore,
     isFetching: isFetchingMore,
   } = useInfinitePokemonScroll({
-    batchLimit: BATCH_LIMIT,
-    initialOffset: INITIAL_BATCH_SIZE,
+    nextUrl: firstPokemon?.next || null,
   })
 
   const pokemon = [...(firstPokemon?.results || []), ...(morePokemon || [])]
 
   return (
-    <>
-      {!pokemon?.length && firstIsLoading && <>Loading initial pokemon...</>}
+    <div style={{ margin: 20 }}>
+      {!pokemon?.length && firstIsLoading && (
+        <div>Loading initial pokemon...</div>
+      )}
       {firstError && <>Oh no, there was an error</>}
       {!firstIsLoading &&
         pokemon &&
         pokemon.map(({ name }: { name: string }) => {
           return <Pokemon key={name} name={name} />
         })}
-      {pokemon.length > 0 && isFetchingMore && (
-        <>Looking for {BATCH_LIMIT} more...</>
-      )}
+
       {errorFetchingMore && <>Error when trying to fetching more...</>}
-    </>
+      <div style={{ height: 100, marginTop: 20 }}>
+        {!isFetchingMore &&
+          (canFetchMore ? (
+            <>Scroll down to fetch more...</>
+          ) : (
+            <>No more pokemon to fetch</>
+          ))}
+        {pokemon.length > 0 && isFetchingMore && (
+          <>Looking for {INITIAL_BATCH_SIZE} more...</>
+        )}
+      </div>
+    </div>
   )
 }

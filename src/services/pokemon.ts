@@ -20,6 +20,7 @@ export type PokemonListItem = {
 }
 
 export type GetManyPokemonResult = {
+  next: string | null
   results: PokemonListItem[]
 }
 
@@ -33,10 +34,24 @@ export const pokemonApi = createApi({
   reducerPath: 'pokemonApi',
   baseQuery: fetchBaseQuery({ baseUrl: 'https://pokeapi.co/api/v2/' }),
   endpoints: (builder) => ({
+    getInfinitePokemon: builder.query<GetManyPokemonResult, string>({
+      query: (queryString) => {
+        return { url: `pokemon?${queryString}` }
+      },
+      provides: (result) => {
+        return result.results.map(({ name }: { name: string }) => ({
+          type: ENTITY_TYPES.POKEMON_LIST_ITEM,
+          id: name,
+        }))
+      },
+    }),
     getManyPokemon: builder.query<GetManyPokemonResult, GetManyPokemonQueryArg>(
       {
-        query: (params) => {
-          return { url: 'pokemon', params }
+        query: ({ limit, offset }) => {
+          // hard-coding the order of query params for this demo as the API
+          // returns the next url on this format, but this should normally be
+          // done with a predictable sorting
+          return { url: `pokemon?offset=${offset}&limit=${limit}` }
         },
         provides: (result) => {
           return result.results.map(({ name }: { name: string }) => ({
@@ -61,6 +76,13 @@ export const pokemonApi = createApi({
   entityTypes: [ENTITY_TYPES.POKEMON, ENTITY_TYPES.POKEMON_LIST_ITEM],
 })
 
+export const getQueryString = (url: GetManyPokemonResult['next']) =>
+  url?.split('?')[1] || null
+
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useGetManyPokemonQuery, useGetPokemonByNameQuery } = pokemonApi
+export const {
+  useGetInfinitePokemonQuery,
+  useGetManyPokemonQuery,
+  useGetPokemonByNameQuery,
+} = pokemonApi

@@ -4,32 +4,31 @@ import { useIsCloseToBottomOfPage } from '../hooks/useIsCloseToBottomOfPage'
 
 import {
   GetManyPokemonResult,
+  getQueryString,
   PokemonListItem,
-  useGetManyPokemonQuery,
+  useGetInfinitePokemonQuery,
 } from './pokemon'
 
 export const useInfinitePokemonScroll = ({
-  batchLimit = 2,
-  initialOffset,
+  nextUrl: nextUrlInput,
 }: {
-  batchLimit?: number
-  initialOffset: number
+  nextUrl: GetManyPokemonResult['next']
 }) => {
-  const [
-    requestedNumberOfPokemon,
-    setRequestedNumberOfPokemon,
-  ] = React.useState(0)
   const [pokemon, setPokemon] = React.useState<PokemonListItem[]>([])
+  const [nextQuery, setNextQuery] = React.useState<
+    GetManyPokemonResult['next']
+  >(null)
 
-  const { data, isFetching, ...rest } = useGetManyPokemonQuery(
+  const { data, isFetching, ...rest } = useGetInfinitePokemonQuery(
+    nextQuery as string,
     {
-      limit: batchLimit,
-      offset: initialOffset + requestedNumberOfPokemon - batchLimit,
-    },
-    { skip: requestedNumberOfPokemon === 0 }
+      skip: !nextQuery,
+    }
   )
 
   const dataRef = React.useRef<GetManyPokemonResult | undefined>(data)
+  const isCloseToBottomOfPage = useIsCloseToBottomOfPage()
+  const isCloseToBottomOfPageRef = React.useRef(isCloseToBottomOfPage)
 
   /*
    * add new data (i.e. if data has changed) to pokemon state
@@ -42,9 +41,6 @@ export const useInfinitePokemonScroll = ({
     dataRef.current = data
   }, [data, pokemon])
 
-  const isCloseToBottomOfPage = useIsCloseToBottomOfPage()
-  const isCloseToBottomOfPageRef = React.useRef(isCloseToBottomOfPage)
-
   /*
    * request more pokemon when getting close to the bottom if there is no
    * fetching in progress and if the requestedNumberOfPokemon is not already
@@ -55,23 +51,30 @@ export const useInfinitePokemonScroll = ({
       isCloseToBottomOfPage &&
       !isCloseToBottomOfPageRef.current &&
       !isFetching &&
-      requestedNumberOfPokemon <= pokemon.length
+      (data?.next || nextUrlInput)
     ) {
-      setRequestedNumberOfPokemon(requestedNumberOfPokemon + batchLimit)
+      // use nextUrlInput from initial query if it's the first time scrolling
+      if (!nextQuery && nextUrlInput) {
+        setNextQuery(getQueryString(nextUrlInput || null))
+      } else {
+        setNextQuery(getQueryString(data?.next || null))
+      }
     }
 
     isCloseToBottomOfPageRef.current = isCloseToBottomOfPage
   }, [
-    batchLimit,
+    data?.next,
     isCloseToBottomOfPage,
     isFetching,
+    nextQuery,
+    nextUrlInput,
     pokemon.length,
-    requestedNumberOfPokemon,
   ])
 
   return {
     data: pokemon,
     isFetching,
+    canFetchMore: !!(nextUrlInput || nextQuery),
     ...rest,
   }
 }

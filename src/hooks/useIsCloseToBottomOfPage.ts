@@ -1,7 +1,7 @@
 import React from 'react'
 
 export const useIsCloseToBottomOfPage = (
-  distanceToBottomConsideredClose = 40
+  distanceToBottomConsideredClose = 0
 ) => {
   const [isCloseToBottomOfPage, setIsCloseToBottomOfPage] = React.useState(
     false
