@@ -1,26 +1,35 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from 'react'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import './App.css'
+import { RtkQueryExample } from './components/RtkQueryExample'
+
+const EXAMPLES = {
+  RTK_QUERY: 'rtk-query',
+  REACT_QUERY: 'react-query',
 }
 
-export default App;
+function App() {
+  const [example, setExample] = React.useState(EXAMPLES.RTK_QUERY)
+
+  const getOtherExampleName = () => {
+    if (example === EXAMPLES.RTK_QUERY) {
+      return EXAMPLES.REACT_QUERY
+    }
+
+    return EXAMPLES.RTK_QUERY
+  }
+
+  return (
+    <div className="App">
+      <div style={{ marginBottom: 20 }}>
+        <h2>Infinite scroll & pull-to-refresh using {example}</h2>
+        <button onClick={() => setExample(getOtherExampleName())}>
+          Change to {getOtherExampleName()}
+        </button>
+      </div>
+      <RtkQueryExample />
+    </div>
+  )
+}
+
+export default App
